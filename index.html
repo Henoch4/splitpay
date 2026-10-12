@@ -1,140 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SplitPay — Revenue Splits on BOT Chain</title>
-<style>
-:root{--bg:#0b0e0a;--fg:#f0f4ec;--mut:#9aa894;--line:#1f281e;--card:#12170f;--acc:#84cc16;--acc2:#ddf3c0;--onacc:#142003;--danger:#ef4444}
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--fg);font-family:'Inter',system-ui,sans-serif;line-height:1.55;min-height:100vh}
-a{color:inherit;text-decoration:none}
-.mono{font-family:'Courier New',monospace}
-.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
-nav{border-bottom:1px solid var(--line);position:sticky;top:0;z-index:50;background:rgba(11,14,10,.92);backdrop-filter:blur(8px)}
-.nav-in{display:flex;align-items:center;justify-content:space-between;height:60px}
-.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px}
-.logo i{width:26px;height:26px;border-radius:6px;background:var(--acc);color:var(--onacc);display:inline-flex;align-items:center;justify-content:center;font-size:16px;font-style:normal}
-.nav-links{display:flex;align-items:center;gap:18px;font-size:13.5px;color:var(--mut)}
-.btn{font-weight:600;font-size:13.5px;padding:10px 18px;border-radius:8px;border:none;cursor:pointer;min-height:40px}
-.btn-a{background:var(--acc);color:var(--onacc)}
-.btn-a:hover{background:var(--acc2)}
-.btn-g{background:transparent;color:var(--fg);border:1px solid var(--line)}
-.btn-g:hover{border-color:var(--acc)}
-.btn-sm{padding:7px 13px;font-size:12.5px;min-height:34px}
-select#netSel{background:var(--card);border:1px solid var(--line);border-radius:8px;font-size:12px;padding:9px;color:var(--fg)}
-.hero{padding:56px 0 30px}
-.hero h1{font-size:clamp(30px,5vw,52px);font-weight:800;letter-spacing:-.02em}
-.hero h1 span{color:var(--acc)}
-.hero p{color:var(--mut);max-width:640px;margin-top:12px;font-size:16px}
-.ticker{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:8px 0 26px}
-.ticker .cell{padding:16px 24px;display:flex;justify-content:space-between;gap:12px}
-.ticker .cell + .cell{border-left:1px solid var(--line)}
-.ticker .k{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
-.ticker .v{font-size:15px;font-weight:700;color:var(--acc2)}
-.grid{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;align-items:start;padding-bottom:48px}
-@media(max-width:860px){.grid{grid-template-columns:1fr}.ticker{grid-template-columns:1fr}.ticker .cell + .cell{border-left:none;border-top:1px solid var(--line)}}
-.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:18px;overflow:hidden}
-.panel-head{padding:14px 18px;border-bottom:1px solid var(--line);font-size:11.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--mut)}
-.row{display:grid;grid-template-columns:130px 1fr auto;gap:12px;align-items:center;padding:13px 18px;border-bottom:1px solid var(--line)}
-.row:last-child{border-bottom:none}
-.row label{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
-.row input,.row textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;color:var(--fg);font-size:14px;padding:10px 12px;min-height:42px;font-family:'Inter',sans-serif}
-.row input.mono,.row textarea.mono{font-family:'Courier New',monospace;font-size:12.5px}
-.row textarea{min-height:64px;resize:vertical}
-.kv{display:flex;justify-content:space-between;padding:11px 18px;border-bottom:1px solid var(--line);font-size:13.5px;color:var(--mut);gap:10px}
-.kv:last-child{border-bottom:none}
-.kv b{color:var(--fg);font-weight:600;text-align:right}
-.hint{padding:10px 18px 16px;font-size:12.5px;color:var(--mut)}
-.msg{display:none;padding:8px 18px 14px;font-size:12.5px;color:var(--acc2)}
-.spl{padding:16px 18px;border-bottom:1px solid var(--line)}
-.spl:last-child{border-bottom:none}
-.spl-top{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
-.spl-top b{font-size:15.5px}
-.tag{font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:5px;border:1px solid;white-space:nowrap}
-.tag.live{color:var(--acc2);border-color:rgba(132,204,22,.5)}
-.tag.done{color:var(--mut);border-color:var(--line)}
-.spl-meta{font-size:12.5px;color:var(--mut);display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px}
-.spl-meta .mono{color:var(--fg);font-size:12px}
-.payees{font-size:12.5px;color:var(--mut);margin-bottom:10px}
-.payees .mono{color:var(--fg);font-size:11.5px}
-.spl-actions{display:flex;gap:8px;flex-wrap:wrap}
-.spl-actions input{width:120px;background:var(--bg);border:1px solid var(--line);border-radius:8px;color:var(--fg);font-size:13px;padding:8px 10px}
-footer{padding:36px 0;border-top:1px solid var(--line);color:var(--mut);font-size:13px}
-footer a{color:var(--acc2)}
-.proof{max-width:440px;margin-top:18px;padding:16px 18px;background:var(--card);border:1px solid var(--line);border-radius:8px}
-.proof-title{font-family:ui-monospace,'Courier New',monospace;font-size:11px;font-weight:600;color:var(--acc);letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px}
-.proof-grid{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-family:ui-monospace,'Courier New',monospace;font-size:12px;color:var(--mut)}
-.proof-grid .val{color:var(--acc);overflow-wrap:anywhere}
-.proof-links{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px}
-.proof-link{font-family:ui-monospace,'Courier New',monospace;font-size:11px;color:var(--acc);border-bottom:1px solid var(--acc);text-decoration:none}
-</style>
-</head>
-<body>
-<nav><div class="wrap nav-in">
-<div class="logo"><i>◑</i>SplitPay</div>
-<div class="nav-links">
-<select id="netSel"><option value="677" selected>Mainnet 677</option><option value="968">Testnet 968</option></select>
-<button class="btn btn-a" id="connectBtn">Connect wallet</button>
-</div>
-</div></nav>
-
-<div class="wrap">
-<div class="hero">
-<h1>Split it <span>fair.</span></h1>
-<p>Revenue splits in native BOT. Define payees and shares once, fund any time, everyone pulls their exact entitlement. No treasurer, no spreadsheet, no trust needed.</p>
-</div>
-
-<div class="ticker">
-<div class="cell"><span class="k">Splits</span><span class="v" id="tSplits">—</span></div>
-<div class="cell"><span class="k">Funded total</span><span class="v" id="tFunded">—</span></div>
-<div class="cell"><span class="k">Your BOT</span><span class="v" id="tBal">—</span></div>
-</div>
-
-<div class="grid">
-<div>
-<div class="panel">
-<div class="panel-head">Splits</div>
-<div id="splList"><div class="hint">Loading splits…</div></div>
-</div>
-</div>
-
-<div>
-<div class="panel">
-<div class="panel-head">New split</div>
-<div class="row"><label>Payees</label><textarea id="nPayees" class="mono" placeholder="0xaaa…, 0xbbb…, 0xccc…"></textarea></div>
-<div class="row" style="border-bottom:none"><label>Shares</label><textarea id="nShares" class="mono" placeholder="60, 30, 10"></textarea></div>
-<div class="row" style="border-bottom:none;grid-template-columns:1fr auto"><span class="hint" style="padding:0">Same count, no duplicates.</span><button class="btn btn-a" id="createBtn">Create →</button></div>
-<div class="msg" id="sMsg"></div>
-</div>
-
-<div class="panel">
-<div class="panel-head">How it works</div>
-<div class="kv"><span>Model</span><b>define once, fund forever</b></div>
-<div class="kv"><span>Payouts</span><b>pull — exact wei math</b></div>
-<div class="kv"><span>Rounds</span><b>fund repeatedly, accumulates</b></div>
-<div class="kv"><span>Strangers</span><b>zero shares, zero payout</b></div>
-<div class="hint">Hackathon prizes, band splits, DAO distributions — settled in one page.</div>
-</div>
-</div>
-</div>
-
-<footer>
-<p>SplitPay — revenue splits on BOT Chain. Every wei accounted for.</p>
-<div class="proof">
-<div class="proof-title">Proof on BOT Mainnet</div>
-<div class="proof-grid">
-<span>Chain ID</span><span class="val">677</span>
-<span>Contract</span><span class="val">0x69D6c631Ee0244C1Bcb73ef65867183707381e3E</span>
-</div>
-<div class="proof-links">
-<a href="https://botchain.ai" target="_blank" rel="noopener" class="proof-link">BOT Chain Website &#8599;</a>
-<a href="https://scan.botchain.ai/" target="_blank" rel="noopener" class="proof-link">BOTScan Explorer &#8599;</a>
-</div>
-</div>
-</footer>
-</div>
-
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>SplitPay — Revenue splits on BOT Chain</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@600;700&display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet"><style>:root{--bg:#f5f1e6;--fg:#111111;--mut:#555;--line:#111111;--card:#ffffff;--acc:#d92b1a;--acc2:#1f4aa8;--yel:#f6c915;--onacc:#ffffff}@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111111;--fg:#f5f1e6;--mut:#aaa;--line:#f5f1e6;--card:#1b1b1b;--acc:#ff4a36;--acc2:#4a78e8;--yel:#f6c915;--onacc:#111111}}@media(prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f5f1e6;--fg:#111111;--mut:#555;--line:#111111;--card:#ffffff;--acc:#d92b1a;--acc2:#1f4aa8;--yel:#f6c915;--onacc:#ffffff}}:root[data-theme="dark"]{--bg:#111111;--fg:#f5f1e6;--mut:#aaa;--line:#f5f1e6;--card:#1b1b1b;--acc:#ff4a36;--acc2:#4a78e8;--yel:#f6c915;--onacc:#111111}:root[data-theme="light"]{--bg:#f5f1e6;--fg:#111111;--mut:#555;--line:#111111;--card:#ffffff;--acc:#d92b1a;--acc2:#1f4aa8;--yel:#f6c915;--onacc:#ffffff}*,*:before,*:after{box-sizing:border-box}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-behavior:smooth;scroll-padding-top:calc(90px + env(safe-area-inset-top,0px))}body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);overflow-x:hidden;-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit;color:inherit}.rv{opacity:0;transform:translateY(40px);transition:1s cubic-bezier(.2,.9,.2,1)}.rv.in{opacity:1;transform:none}.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));translate:-50% 220%;background:var(--fg);color:var(--bg);padding:14px 24px;border-radius:99px;z-index:100;transition:translate .5s cubic-bezier(.2,.9,.2,1);font-size:14px;max-width:90vw;text-align:center}.toast.on{translate:-50% 0}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+:root{--disp:'Josefin Sans',system-ui,sans-serif;--sans:'Work Sans',system-ui,sans-serif}
+header{display:flex;justify-content:space-between;align-items:center;padding:calc(14px + env(safe-area-inset-top,0px)) clamp(16px,3vw,40px) 14px;border-bottom:6px solid var(--line)}
+.lg{font-family:var(--disp);font-weight:700;font-size:28px;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:10px}.lg i{width:26px;height:26px;border-radius:50%;background:linear-gradient(90deg,var(--acc) 50%,var(--card) 50%);border:4px solid var(--line);display:block}
+.rt{display:flex;gap:10px;align-items:center}.net{display:flex;border:4px solid var(--line)}.net button{all:unset;cursor:pointer;padding:7px 14px;font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.06em}.net .on{background:var(--yel);color:#111}
+.cw{all:unset;cursor:pointer;background:var(--acc);color:#fff;border:4px solid var(--line);padding:9px 20px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:13px}
+.hero{display:grid;grid-template-columns:1fr 1fr;border-bottom:6px solid var(--line)}
+.hl{padding:clamp(24px,4vw,56px) clamp(16px,3vw,40px);display:flex;flex-direction:column;justify-content:space-between;gap:28px}
+.hl h1{font-family:var(--disp);font-weight:700;font-size:clamp(64px,10.5vw,170px);line-height:.86;margin:0;text-transform:uppercase}.hl h1 span{display:block}.hl h1 .a{color:var(--acc)}.hl h1 .b{color:var(--acc2)}
+.hl p{font-size:19px;line-height:1.55;max-width:480px;margin:0}
+.mond{position:relative;border-left:6px solid var(--line);min-height:560px;aspect-ratio:1;background:var(--card)}
+.mb{position:absolute;border:3px solid var(--line);padding:clamp(6px,1.2vw,16px);display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;transition:all .7s cubic-bezier(.2,.9,.2,1);cursor:pointer}
+.mb h4{font-family:var(--disp);font-weight:700;font-size:clamp(11px,1.5vw,20px);text-transform:uppercase;margin:0;letter-spacing:.04em;word-break:break-all}.mb b{font-family:var(--disp);font-weight:700;font-size:clamp(26px,5vw,72px);line-height:.9}.mb small{font-size:clamp(10px,1vw,13px);font-weight:600}
+.mb.c0{background:var(--acc);color:#fff}.mb.c1{background:var(--card);color:var(--fg)}.mb.c2{background:var(--acc2);color:#fff}.mb.c3{background:var(--yel);color:#111}.mb.c4{background:var(--fg);color:var(--bg)}
+.st{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:6px solid var(--line)}.st div{padding:20px clamp(16px,3vw,40px);border-right:6px solid var(--line)}.st div:last-child{border:0}.st b{font-family:var(--disp);font-weight:700;font-size:clamp(34px,5vw,72px);line-height:1;display:block}.st span{font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+.tabs{display:flex;border-bottom:6px solid var(--line);overflow-x:auto}.tabs button{all:unset;cursor:pointer;padding:18px clamp(16px,3vw,32px);font-family:var(--disp);font-weight:700;font-size:20px;text-transform:uppercase;border-right:6px solid var(--line);white-space:nowrap}.tabs .on{background:var(--yel);color:#111}
+.ops{display:grid;grid-template-columns:1.2fr .8fr;border-bottom:6px solid var(--line)}.ops>div{padding:clamp(20px,3vw,40px)}.ops>div+div{border-left:6px solid var(--line)}
+.ops h3,.nw h3,.hw h3{font-family:var(--disp);font-weight:700;font-size:30px;text-transform:uppercase;margin:0 0 18px}
+table{width:100%;border-collapse:collapse;font-size:15px}th{font-size:11px;letter-spacing:.12em;text-transform:uppercase;text-align:left;padding:10px 8px;border-bottom:4px solid var(--line)}td{padding:14px 8px;border-bottom:2px solid var(--line)}td button{all:unset;cursor:pointer;border:3px solid var(--line);padding:6px 12px;font-weight:700;font-size:12px;text-transform:uppercase}td button:hover{background:var(--acc);color:#fff}
+.fd label,.nw label{display:block;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px}.fd input,.nw input,.nw textarea{all:unset;display:block;width:100%;border:4px solid var(--line);padding:11px 14px;margin-top:6px;background:var(--card);font-size:17px;box-sizing:border-box;text-transform:none;letter-spacing:0}.nw textarea{min-height:54px;white-space:pre-wrap}
+.go{all:unset;cursor:pointer;background:var(--acc2);color:#fff;border:4px solid var(--line);padding:14px 24px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:14px}.go:hover{background:var(--yel);color:#111}
+.nw{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:6px solid var(--line)}.nw>div{padding:clamp(20px,3vw,40px)}.nw>div+div{border-left:6px solid var(--line)}.nw p{font-size:13px;margin:0 0 14px}
+.hw{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:6px solid var(--line)}.hw>div{padding:clamp(20px,3vw,36px);border-right:6px solid var(--line)}.hw>div:last-child{border:0}.hw>div:nth-child(1){background:var(--yel);color:#111}.hw>div:nth-child(3){background:var(--acc);color:#fff}.hw span{font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}.hw b{display:block;font-family:var(--disp);font-weight:700;font-size:32px;text-transform:uppercase;line-height:1;margin:10px 0}.hw p{margin:0;font-size:15px;line-height:1.5}
+footer{padding:24px clamp(16px,3vw,40px);display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;font-weight:600;font-size:13px}
+@media(max-width:900px){.hero,.ops,.nw,.hw,.st{grid-template-columns:1fr}.mond{border-left:0;border-top:6px solid var(--line)}.ops>div+div,.nw>div+div{border-left:0;border-top:6px solid var(--line)}.hw>div,.st div{border-right:0;border-bottom:6px solid var(--line)}.net{display:none}}
+</style></head><body>
+<header><a class="lg" href="#"><i></i>SplitPay</a><div class="rt"><div class="net"><button class="on">Mainnet 677</button><button>Testnet 968</button></div><button class="cw" id="w">Connect wallet</button></div></header>
+<section class="hero"><div class="hl"><h1><span>Split</span><span class="a">it</span><span class="b">fair.</span></h1><p>Revenue splits in native BOT. Define payees and shares once, fund any time, and everyone pulls their exact entitlement. No treasurer, no spreadsheet, no trust needed.</p></div><div class="mond" id="mo"></div></section>
+<div class="st"><div><b id="k1">0</b><span>Splits</span></div><div><b id="k2">0</b><span>Funded total (BOT)</span></div><div><b id="k3">0</b><span>Your BOT</span></div></div>
+<div class="tabs" id="tb"></div>
+<section class="ops"><div><h3 id="sn">Payees</h3><table><thead><tr><th>Payee</th><th>Share</th><th>Entitled</th><th>Claimable</th><th></th></tr></thead><tbody id="pt"></tbody></table></div><div class="fd"><h3>Fund this split</h3><label>Amount (BOT)<input id="fa" value="1000" inputmode="decimal"></label><button class="go" id="fb">Fund →</button><p style="font-size:13px;margin:16px 0 0" id="fr"></p></div></section>
+<section class="nw"><div><h3>New split</h3><label>Payees<textarea id="np" placeholder="0xA11c…, 0x3b7d…, 0x91fE…"></textarea></label><label>Shares<input id="ns" placeholder="50, 30, 20"></label><p>Same count, no duplicates.</p><button class="go" id="nb">Create →</button></div><div><h3>Strangers</h3><p style="font-size:20px;line-height:1.5">Zero shares, zero payout. Anyone not in the split can never pull a single wei.</p></div><div><h3>Rounds</h3><p style="font-size:20px;line-height:1.5">Fund repeatedly and it accumulates. Hackathon prizes, band splits, DAO distributions, settled in one page.</p></div></section>
+<section class="hw"><div><span>Model</span><b>Define once, fund forever</b><p>Payees and shares are set at creation.</p></div><div><span>Payouts</span><b>Pull, exact wei math</b><p>Each payee withdraws exactly what they are owed.</p></div><div><span>Rounds</span><b>Fund repeatedly</b><p>Every deposit accumulates for everyone.</p></div><div><span>Strangers</span><b>Zero shares, zero payout</b><p>Only listed payees can ever pull.</p></div></section>
+<footer><span>SplitPay — Revenue splits on BOT Chain. Every wei accounted for.</span><span>Proof on BOT Mainnet · Chain 677 · 0x69D6c631Ee0244C1Bcb73ef65867183707381e3E · <a href="https://botchain.ai" target="_blank" rel="noopener">BOT Chain Website ↗</a> · <a href="https://scan.botchain.ai/" target="_blank" rel="noopener">BOTScan Explorer ↗</a></span></footer>
+<div class="toast" id="toast"></div>
 <script type="importmap">
 {"imports":{"ethers":"https://esm.sh/ethers@6.13.2","@reown/appkit":"https://esm.sh/@reown/appkit@1.8.21","@reown/appkit-adapter-ethers":"https://esm.sh/@reown/appkit-adapter-ethers@1.8.21"}}
 </script>
@@ -142,29 +40,13 @@ footer a{color:var(--acc2)}
 import { ethers } from 'ethers';
 import { createAppKit } from '@reown/appkit';
 import { EthersAdapter } from '@reown/appkit-adapter-ethers';
-
 const PROJECT_ID = 'f018499b1e4a94d961ab67aeeeff3254';
-const CONTRACTS = {
-  677: { sp: '0x69D6c631Ee0244C1Bcb73ef65867183707381e3E' },
-  968: { sp: '0xb4431Af0fFa959e055aB2AF9580ad70FF6468fcA' },
-};
-const SP_ABI = [
-  'function totalSplits() view returns (uint256)',
-  'function getSplit(uint256) view returns (address[],uint256[],uint256,uint256)',
-  'function owed(uint256,address) view returns (uint256)',
-  'function create(address[],uint256[]) returns (uint256)',
-  'function fund(uint256) payable',
-  'function release(uint256,address)',
-];
-const $ = (id) => document.getElementById(id);
-let currentChainId = 677, account = null;
-
-const appkit = createAppKit({
-  adapters: [new EthersAdapter()],
-  networks: [{ id: 677, name: 'BOT Mainnet', nativeCurrency: { name: 'BOT', symbol: 'BOT', decimals: 18 }, rpcUrls: { default: { http: ['https://rpc.botchain.ai'] } } }, { id: 968, name: 'BOT Testnet', nativeCurrency: { name: 'BOT', symbol: 'BOT', decimals: 18 }, rpcUrls: { default: { http: ['https://rpc.bohr.life'] } } }],
-  projectId: PROJECT_ID,
-  features: { analytics: false },
-});
+const CONTRACTS = { 677: { sp: '0x69D6c631Ee0244C1Bcb73ef65867183707381e3E' }, 968: { sp: '0xb4431Af0fFa959e055aB2AF9580ad70FF6468fcA' } };
+const SP_ABI = ['function totalSplits() view returns (uint256)','function getSplit(uint256) view returns (address[],uint256[],uint256,uint256)','function owed(uint256,address) view returns (uint256)','function create(address[],uint256[]) returns (uint256)','function fund(uint256) payable','function release(uint256,address)'];
+const $ = (s) => document.querySelector(s.startsWith('#') || s.startsWith('.') ? s : '#' + s);
+const $$ = (s) => [...document.querySelectorAll(s)];
+let currentChainId = 677, account = null, cur = 0, SP = []; // splitpay module
+const appkit = createAppKit({ adapters: [new EthersAdapter()], networks: [{ id: 677, name: 'BOT Mainnet', nativeCurrency: { name: 'BOT', symbol: 'BOT', decimals: 18 }, rpcUrls: { default: { http: ['https://rpc.botchain.ai'] } } }, { id: 968, name: 'BOT Testnet', nativeCurrency: { name: 'BOT', symbol: 'BOT', decimals: 18 }, rpcUrls: { default: { http: ['https://rpc.bohr.life'] } } }], projectId: PROJECT_ID, features: { analytics: false } });
 async function getSigner() {
   if (typeof appkit !== 'undefined' && appkit && typeof appkit.getWalletProvider === 'function') {
     const wp = appkit.getWalletProvider('eip155') || appkit.getWalletProvider();
@@ -172,106 +54,102 @@ async function getSigner() {
   }
   throw new Error('Connect a wallet first');
 }
+let _t; function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(_t); _t = setTimeout(() => t.classList.remove('on'), 2800); }
 function short(a) { return !a ? '—' : a.slice(0, 6) + '…' + a.slice(-4); }
-function msg(id, t, ok) {
-  const el = $(id); el.style.display = 'block';
-  el.style.color = ok === false ? 'var(--danger)' : 'var(--acc2)';
-  el.textContent = t;
+function fmt(n, d = 0) { return Number(n).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d }); }
+async function provider() { return new ethers.JsonRpcProvider(currentChainId === 968 ? 'https://rpc.bohr.life' : 'https://rpc.botchain.ai'); }
+async function spRead() { const c = CONTRACTS[currentChainId]; if (!c) return null; return new ethers.Contract(c.sp, SP_ABI, await provider()); }
+function lay(items, x, y, w, h, out) {
+  if (items.length === 1) { out.push({ i: items[0].i, x, y, w, h }); return; }
+  const tot = items.reduce((a, b) => a + b.v, 0);
+  let acc = 0, k = 0;
+  for (; k < items.length - 1; k++) { if (acc + items[k].v >= tot / 2 && k > 0) break; acc += items[k].v; }
+  if (k === 0) { k = 1; acc = items[0].v; }
+  const fr = acc / tot;
+  if (w >= h) { lay(items.slice(0, k), x, y, w * fr, h, out); lay(items.slice(k), x + w * fr, y, w * (1 - fr), h, out); }
+  else { lay(items.slice(0, k), x, y, w, h * fr, out); lay(items.slice(k), x, y + h * fr, w, h * (1 - fr), out); }
 }
-async function provider() {
-  return new ethers.JsonRpcProvider(currentChainId === 968 ? 'https://rpc.bohr.life' : 'https://rpc.botchain.ai');
-}
-async function spRead() {
-  const c = CONTRACTS[currentChainId];
-  if (!c) return null;
-  return new ethers.Contract(c.sp, SP_ABI, await provider());
-}
-function fmt(v) { try { return ethers.formatEther(v); } catch (e) { return String(v); } }
 async function refresh() {
   const t = await spRead();
-  if (!t) { $('splList').innerHTML = '<div class="hint">Switch chain above.</div>'; return; }
+  if (!t) return;
   const n = Number(await t.totalSplits());
-  $('tSplits').textContent = n;
-  let funded = 0n;
-  const list = [];
+  SP = [];
   for (let i = 0; i < n; i++) {
     const s = await t.getSplit(i);
-    list.push({ id: i, payees: s[0], shares: s[1].map((x) => x.toString()), totalShares: s[2].toString(), funded: s[3] });
-    funded += s[3];
+    const payees = [...s[0]], shares = s[1].map((x) => Number(x));
+    const owedList = [];
+    for (const p of payees) { try { owedList.push(await t.owed(i, p)); } catch (e) { owedList.push(0n); } }
+    SP.push({ id: i, payees, shares, totalShares: Number(s[2]), funded: s[3], owedList });
   }
-  $('tFunded').textContent = fmt(funded) + ' BOT';
-  if (account) {
-    try { $('tBal').textContent = Number(ethers.formatEther(await (await provider()).getBalance(account))).toFixed(4) + ' BOT'; } catch (e) {}
-  }
-  if (!list.length) { $('splList').innerHTML = '<div class="hint">No splits yet — create the first one →</div>'; return; }
+  if (cur >= SP.length) cur = Math.max(0, SP.length - 1);
   const me = (account || '').toLowerCase();
-  let html = '';
-  for (const s of list.slice().reverse()) {
-    let mine = 0n;
-    if (account) { try { mine = await t.owed(s.id, account); } catch (e) {} }
-    html += '<div class="spl"><div class="spl-top"><b>Split #' + s.id + ' · ' + s.payees.length + ' payees</b>'
-      + '<span class="tag ' + (s.funded > 0n ? 'live' : 'done') + '">' + fmt(s.funded) + ' BOT in</span></div>'
-      + '<div class="payees">' + s.payees.map((p, i) => '<span class="mono">' + short(p) + '</span> ×' + s.shares[i]).join(' · ') + '</div>'
-      + (account ? '<div class="kv"><span>Your entitlement</span><b>' + fmt(mine) + ' BOT</b></div>' : '')
-      + '<div class="spl-actions"><input id="f-' + s.id + '" type="number" step="any" placeholder="fund BOT"><button class="btn btn-g btn-sm" data-act="fund" data-id="' + s.id + '">Fund</button>'
-      + (mine > 0n ? '<button class="btn btn-a btn-sm" data-act="release" data-id="' + s.id + '">Release ' + fmt(mine) + ' →</button>' : '')
-      + '</div></div>';
-  }
-  $('splList').innerHTML = html;
+  $('#k1').textContent = n;
+  $('#k2').textContent = fmt(ethers.formatEther(SP.reduce((a, s) => a + s.funded, 0n)));
+  if (account) { try { $('#k3').textContent = fmt(ethers.formatEther(await (await provider()).getBalance(account)), 2); } catch (e) {} }
+  else $('#k3').textContent = '0';
+  $('#tb').innerHTML = SP.map((x, i) => '<button class="' + (i === cur ? 'on' : '') + '" data-i="' + i + '">' + 'Split #' + x.id + '</button>').join('');
+  const s = SP[cur];
+  if (!s) { $('#mo').innerHTML = ''; $('#sn').textContent = 'No splits'; $('#pt').innerHTML = ''; $('#fr').textContent = ''; return; }
+  $('#sn').textContent = 'Split #' + s.id;
+  const tot = s.shares.reduce((a, b) => a + b, 0);
+  const out = [];
+  lay(s.payees.map((p, i) => ({ i, v: s.shares[i] })).sort((a, b) => b.v - a.v), 0, 0, 100, 100, out);
+  $('#mo').innerHTML = out.map((r) => {
+    const isMe = me && s.payees[r.i].toLowerCase() === me;
+    return '<div class="mb c' + (r.i % 5) + '" data-i="' + r.i + '" style="left:' + r.x + '%;top:' + r.y + '%;width:' + r.w + '%;height:' + r.h + '%"><h4>' + short(s.payees[r.i]) + (isMe ? ' (you)' : '') + '</h4><div><b>' + Math.round(s.shares[r.i] / tot * 100) + '%</b><br><small>' + fmt(ethers.formatEther((s.funded * BigInt(s.shares[r.i])) / BigInt(s.totalShares)), 2) + ' BOT</small></div></div>';
+  }).join('');
+  $('#pt').innerHTML = s.payees.map((p, i) => {
+    const ent = (s.funded * BigInt(s.shares[i])) / BigInt(s.totalShares);
+    const cl = s.owedList[i] || 0n;
+    return '<tr><td><b>' + short(p) + '</b>' + (me && p.toLowerCase() === me ? ' (you)' : '') + '</td><td>' + Math.round(s.shares[i] / tot * 100) + '%</td><td>' + fmt(ethers.formatEther(ent), 4) + '</td><td>' + fmt(ethers.formatEther(cl), 4) + '</td><td><button data-i="' + i + '">Pull</button></td></tr>';
+  }).join('');
+  $('#fr').textContent = 'Funded total ' + fmt(ethers.formatEther(s.funded)) + ' BOT';
 }
 async function write(fn, args, value, okMsg) {
   try {
     const s = await getSigner();
     const t = new ethers.Contract(CONTRACTS[currentChainId].sp, SP_ABI, s);
     const tx = value !== undefined ? await t[fn](...args, { value }) : await t[fn](...args);
-    msg('sMsg', 'Sent: ' + tx.hash.slice(0, 18) + '… waiting…');
+    toast('Sent ' + tx.hash.slice(0, 12) + '… waiting…');
     await tx.wait();
-    msg('sMsg', okMsg || 'Confirmed ✓');
+    toast(okMsg || 'Confirmed ✓');
     await refresh();
-  } catch (e) {
-    msg('sMsg', 'Failed: ' + (e.shortMessage || e.reason || e.message || e).toString().slice(0, 160), false);
-  }
+  } catch (e) { toast('Failed: ' + (e.shortMessage || e.reason || e.message || e).toString().slice(0, 140)); }
 }
-$('splList').addEventListener('click', async (e) => {
-  const b = e.target.closest('[data-act]'); if (!b) return;
-  const id = Number(b.dataset.id);
-  if (b.dataset.act === 'fund') {
-    const v = $('f-' + id).value.trim();
-    if (!v || Number(v) <= 0) { msg('sMsg', 'Enter a positive fund amount.', false); return; }
-    await write('fund', [id], ethers.parseEther(v), 'Funded ✓ entitlements updated.');
-  } else if (b.dataset.act === 'release') {
-    await write('release', [id, account], undefined, 'Released ✓ paid to you.');
-  }
+async function pull(i) {
+  const s = SP[cur]; if (!s) return;
+  const p = s.payees[i];
+  await write('release', [s.id, p], undefined, short(p) + ' pulled ✓');
+}
+$('#tb').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { cur = +b.dataset.i; refresh(); } });
+$('#pt').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) pull(+b.dataset.i); });
+$('#mo').addEventListener('click', (e) => { const b = e.target.closest('.mb'); if (b) pull(+b.dataset.i); });
+$('#fb').addEventListener('click', async () => {
+  const a = $('#fa').value.trim();
+  if (!a || Number(a) <= 0 || !SP[cur]) { toast('Enter an amount.'); return; }
+  await write('fund', [SP[cur].id], ethers.parseEther(a), 'Funded ✓ entitlements grew.');
 });
-$('createBtn').addEventListener('click', async () => {
-  const payees = $('nPayees').value.split(',').map((s) => s.trim()).filter(Boolean);
-  const shares = $('nShares').value.split(',').map((s) => s.trim()).filter(Boolean);
-  if (!payees.length || payees.length !== shares.length || !payees.every((p) => /^0x[0-9a-fA-F]{40}$/.test(p)) || !shares.every((x) => /^\d+$/.test(x) && Number(x) > 0)) {
-    msg('sMsg', 'Matching payee addresses + positive integer shares required.', false); return;
-  }
-  if (new Set(payees.map((p) => p.toLowerCase())).size !== payees.length) { msg('sMsg', 'Duplicate payee.', false); return; }
-  await write('create', [payees, shares.map((x) => BigInt(x))], undefined, 'Split created ✓ fund it next.');
+$('#nb').addEventListener('click', async () => {
+  const a = $('#np').value.split(',').map((x) => x.trim()).filter(Boolean);
+  const b = $('#ns').value.split(',').map((x) => x.trim()).filter(Boolean);
+  if (!a.length || a.length !== b.length || !a.every((p) => /^0x[0-9a-fA-F]{40}$/.test(p)) || !b.every((x) => /^\d+$/.test(x) && Number(x) > 0)) { toast('Matching payee addresses + positive integer shares required.'); return; }
+  if (new Set(a.map((p) => p.toLowerCase())).size !== a.length) { toast('No duplicate payees.'); return; }
+  await write('create', [a, b.map((x) => BigInt(x))], undefined, 'Split created ✓ fund it to pay everyone.');
+  cur = SP.length;
 });
-if ($('connectBtn')) {
-  appkit.subscribeAccount((a) => {
-    account = a.address || null;
-    $('connectBtn').textContent = account ? account.slice(0, 6) + '…' + account.slice(-4) : 'Connect wallet';
-    refresh();
-  });
-  appkit.subscribeNetwork((n) => {
-    if (n && n.chainId) { currentChainId = Number(n.chainId); const s = $('netSel'); if (s) s.value = String(currentChainId); }
-    refresh();
-  });
-  $('connectBtn').addEventListener('click', () => appkit.open());
-  if ($('netSel')) $('netSel').addEventListener('change', (e) => {
-    const id = Number(e.target.value);
-    try { appkit.switchNetwork({ id }); } catch (err) {}
-    currentChainId = id;
-    refresh();
-  });
+$$('.net button').forEach((b, i) => b.addEventListener('click', () => {
+  $$('.net button').forEach((x) => x.classList.toggle('on', x === b));
+  currentChainId = i === 0 ? 677 : 968;
+  try { appkit.switchNetwork({ id: currentChainId }); } catch (err) {}
+  toast('Switched to ' + b.textContent);
+  cur = 0;
+  refresh();
+}));
+if ($('#w')) {
+  appkit.subscribeAccount((a) => { account = a.address || null; $('#w').textContent = account ? short(account) : 'Connect wallet'; refresh(); });
+  appkit.subscribeNetwork((n) => { if (n && n.chainId) { currentChainId = Number(n.chainId); const bs = $$('.net button'); bs.forEach((x, i) => x.classList.toggle('on', (i === 0 ? 677 : 968) === currentChainId)); } cur = 0; refresh(); });
+  $('#w').addEventListener('click', () => appkit.open());
 }
 refresh();
-setInterval(() => { if (!document.hidden) refresh(); }, 25000);
-</script>
-</body>
-</html>
+setInterval(() => { if (!document.hidden) refresh(); }, 30000);
+</script>}</body></html>
